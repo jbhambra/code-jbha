@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Stop sign example</title>
+		<script src="hw1_stopsign.js"></script>
+		<link rel="stylesheet" href="hw1.css">
+	</head>
+	<body>
+		<svg id="stopsignSvg" height="300" width="500">
+
+			<g>
+				<polygon points="25,25 50,25 75,50
+				75,75 50,100 25,100 0,75, 0,50"
+				fill="red" stroke="gray" stroke-width="2" ></polygon>
+				<text x=10 y=70 font-family="san-serif"
+				font-size="24px" fill="#00000">
+					STOP
+				</text>
+			</g>
+
+			<g transform="translate(190,25) rotate(90)">
+				<polygon points="25,25 50,25 75,50
+				75,75 50,100 25,100 0,75, 0,50"
+				fill="red" stroke="gray" stroke-width="2" ></polygon>
+				<text x=10 y=70 font-family="san-serif"
+				font-size="24px" fill="#00000">
+					STOP
+				</text>
+			</g>
+
+			<g transform="translate(255,125) rotate(180)">
+				<polygon points="25,25 50,25 75,50
+				75,75 50,100 25,100 0,75, 0,50"
+				fill="red" stroke="gray" stroke-width="2" ></polygon>
+				<text x=10 y=70 font-family="san-serif"
+				font-size="24px" fill="#00000">
+					STOP
+				</text>
+			</g>
+
+			<g transform="translate(0,125)">
+				<polygon points="25,25 50,25 75,50
+				75,75 50,100 25,100 0,75, 0,50"
+				fill="red" stroke="gray" stroke-width="2" >
+
+					<animateTransform
+					attributeName="transform"
+					begin="0s"
+					dur="20s"
+					type="rotate"
+					from="0 60 60"
+					to="360 60 60"
+					repeatCount="indefinite"
+					></animateTransform>
+
+				</polygon>
+				<text x=10 y=70 font-family="san-serif"
+				font-size="24px" fill="#00000">
+					STOP
+					<animateTransform
+					attributeName="transform"
+					begin="0s"
+					dur="20s"
+					type="rotate"
+					from="0 60 60"
+					to="360 60 60"
+					repeatCount="indefinite"
+					></animateTranform>
+				</text>
+
+			</g>
+
+		</svg>
+	</body>
+</html>

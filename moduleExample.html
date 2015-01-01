@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+<title>Salary Example</title>
+<script type="text/javascript">
+ 
+function Employee() {
+    var salary = 50000,
+        employee = {};
+    employee.getSalary = function() { return salary; };
+ 
+    return employee;
+}
+ 
+ var newEmployee = Employee();
+
+function Manager() {
+  
+manager = {};
+manager.getSalary = function() {
+var employeeSalary = newEmployee.getSalary();
+var managerSalary = newEmployee.getSalary() + (0.5 * newEmployee.getSalary());
+return managerSalary;
+};
+return manager;
+}
+ 
+function getSalaryInfo() {
+var newEmployee = Employee();
+document.getElementById("empSalary").value = newEmployee.getSalary();
+ 
+var newManager = new Manager();
+document.getElementById("manSalary").value = newManager.getSalary();
+ 
+};
+ 
+</script>
+</head>
+<body>
+<p>Employee Salary <input id="empSalary"type="text" /></p>
+<p>Manager Salary <input id="manSalary" type="text" /></p>
+<button onclick="getSalaryInfo();">Get Salary Info</button>
+ 
+</body>
+</html>

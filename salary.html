@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+<title>Salary Example</title>
+<script type="text/javascript">
+ 
+function Employee() {
+this.salary = 50000;
+};
+ 
+Employee.prototype.getSalary = function() {
+                return this.salary;
+};
+ 
+function Manager() {
+}
+Manager.prototype = new Employee();
+ 
+Manager.prototype.getSalary = function () {
+return (this.salary + ((50/100) * this.salary));
+};
+ 
+function getSalaryInfo() {
+var newEmployee = new Employee();
+document.getElementById("empSalary").value = newEmployee.getSalary();
+ 
+var newManager = new Manager();
+document.getElementById("manSalary").value = newManager.getSalary();
+ 
+};
+ 
+</script>
+</head>
+<body>
+<p>Employee Salary <input id="empSalary"type="text" /></p>
+<p>Manager Salary <input id="manSalary" type="text" /></p>
+<button onclick="getSalaryInfo();">Get Salary Info</button>
+ 
+</body>
+</html>
