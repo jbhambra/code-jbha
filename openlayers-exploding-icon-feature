@@ -1,0 +1,104 @@
+._onHighlightIcon = function(event) { //event is a feature with lat/lng
+	//On highlightIcon, get the latLng of highlighted Icon
+	var latLng = event.feature.geometry.getBounds().getCenterLonLat();
+  
+	//convert into pixels
+	var convertedLatLngToPixel = this._mapDisplay.getLayerPxFromLonLat(latLng);
+  	
+	//calculate the area around the highlightedIcon to 16px around.
+	var topLeft = new OpenLayers.Pixel(convertedLatLngToPixel.x - 16, convertedLatLngToPixel.y + 16);
+	var bottomRight = new OpenLayers.Pixel(convertedLatLngToPixel.x + 16, convertedLatLngToPixel.y - 16);
+	
+	//take these tl, br pixels and convert them to lat lng
+    var topLeftLonLat = this._mapDisplay.getLonLatFromPixel(topLeft) ;
+    var bottomRightLonLat = this._mapDisplay.getLonLatFromPixel(bottomRight);
+
+    //create a bounding box:
+    var boundingBox = new OpenLayers.Bounds(topLeftLonLat.lon, topLeftLonLat.lat, bottomRightLonLat.lon, bottomRightLonLat.lat);
+ 
+    //get all events that reside between the bounding box and put them into an array.
+    var closeByFeaturesArray = new Array();
+    var arrayLength =  this._mapDisplay.layers[2].features.length;
+  
+    //for each event in layer, loop through until all events residing between bounding box are found
+    for(var i= 0; i<arrayLength; i++) {
+	  var feature = this._mapDisplay.layers[2].features[i];
+	  var isFound = boundingBox.containsLonLat(feature.geometry.getBounds().getCenterLonLat());
+	//if feature is within bounding box, add it to the array.
+	  if(isFound){
+		  closeByFeaturesArray.push(feature);			  
+		  }
+	  }
+    console.info(["closeByFeaturesArray length = " + closeByFeaturesArray.length, closeByFeaturesArray]);
+    
+    //only go thru array if there is more than 1 feature
+    if(closeByFeaturesArray.length > 1) {
+    	
+    	   //get each feature in array and move it except the hovered-over feature which will be first element in array
+		   for (var count = 1; count < closeByFeaturesArray.length; count++) 
+		   {
+
+			console.info("hovered array" + closeByFeaturesArray[count].data.label);
+			var lonLatVar = closeByFeaturesArray[count].geometry.getBounds()
+					.getCenterLonLat();
+			var pixeledLonLatVar = this._mapDisplay
+					.getLayerPxFromLonLat(lonLatVar);
+			var newPixeledLonLatVar = new OpenLayers.Pixel(
+					pixeledLonLatVar.x - 30, pixeledLonLatVar.y + 30);
+			
+			var convertBackToNewLonLat =  this._mapDisplay.getLonLatFromLayerPx(newPixeledLonLatVar);
+			
+			console.info(convertBackToNewLonLat + "convertBackToNewLonLat");
+			console.info(newPixeledLonLatVar);
+			closeByFeaturesArray[count].move(newPixeledLonLatVar);
+			console.info(closeByFeaturesArray[count].geometry.getBounds()
+					.getCenterLonLat());
+
+			
+			var startingPoint = new OpenLayers.Geometry.Point(closeByFeaturesArray[0].geometry.getBounds().getCenterLonLat().lon,
+					closeByFeaturesArray[0].geometry.getBounds().getCenterLonLat().lat);
+
+			var endPoint = new OpenLayers.Geometry.Point(
+					convertBackToNewLonLat.lon,
+					convertBackToNewLonLat.lat);
+			
+			console.info("starting point" + startingPoint);
+			console.info("end point" + endPoint);
+				
+			var pointList = [];
+			
+			pointList.push(startingPoint);
+			pointList.push(endPoint);
+			
+			var style_black = {
+					strokeColor: "#000000", 
+					strokeWidth: 3,
+					pointRadius: 6
+			}
+			//Create linefeature
+			var lineFeature = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString(pointList), null, style_black);
+			
+		 //lineLayer.addFeatures([lineFeature]);
+		 this._mapView.addFeaturesToSeparateFeaturesLayer(lineFeature);
+		 
+		}		   
+    }
+    
+}
+
+/**
+/**
+ * Add a layer with additional features added to the map
+ */
+MapView.prototype.addFeaturesToSeparateFeaturesLayer = function(features) {
+
+	  this._additionalFeaturesLayer =  new OpenLayers.Layer.Vector("Additional Features", {
+      projection: new OpenLayers.Projection("EPSG:4326")  }); //add any new additional temporary layers. 
+      //above line should be sepearted so only one layer gets created per session
+      
+	this._additionalFeaturesLayer.addFeatures([features]);
+	this._map.addLayer(this._additionalFeaturesLayer);
+}
+
+**/
+

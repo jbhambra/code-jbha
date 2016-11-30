@@ -1,0 +1,121 @@
+_onHighlightIcon = function(event) {
+	//create a style for line feature
+	var style_black = {
+			strokeColor: "#000000", 
+			strokeWidth: 3,
+			pointRadius: 6
+	}
+	
+	//On highlightIcon, get the latLng of highlighted Icon
+	var latLng = event.feature.geometry.getBounds().getCenterLonLat();
+  
+	//convert into pixels
+	var convertedLatLngToPixel = this._mapDisplay.getLayerPxFromLonLat(latLng);
+  	
+	//calculate the area around the highlightedIcon to 16px around.
+	var topLeft = new OpenLayers.Pixel(convertedLatLngToPixel.x - 16, convertedLatLngToPixel.y + 16);
+	var bottomRight = new OpenLayers.Pixel(convertedLatLngToPixel.x + 16, convertedLatLngToPixel.y - 16);
+	
+	//take these topleft, bottomRight pixels and convert them back to lat lng
+    var topLeftLonLat = this._mapDisplay.getLonLatFromPixel(topLeft) ;
+    var bottomRightLonLat = this._mapDisplay.getLonLatFromPixel(bottomRight);
+
+    //create a bounding box:
+    var boundingBox = new OpenLayers.Bounds(topLeftLonLat.lon, topLeftLonLat.lat, bottomRightLonLat.lon, bottomRightLonLat.lat);
+ 
+    //get all events that reside between the bounding box and put them into a new array.
+    var closeByFeaturesArray = new Array();
+ 
+    //get all data layers from the map
+    var dataLayerArray = this._mapView.getDataLayers();
+    
+    //for each layer in dataLayers
+    for(var layerCount = 0; layerCount<dataLayerArray.length; layerCount++) 
+    {
+    	//get length of features in each layer present in dataLayerArray
+    	var layerFeatureArrayLength = dataLayerArray[layerCount].getLayer().features.length;
+
+		// for each event in layer, loop through until all events residing
+		// between bounding box are found
+		for (var i = 0; i < layerFeatureArrayLength; i++) {
+			var feature = dataLayerArray[layerCount].getLayer().features[i];
+			var isFound = boundingBox.containsLonLat(feature.geometry.getBounds().getCenterLonLat());
+
+			//if feature is within bounding box, add it to the array. this will also add the starting hovered over feature.
+			if(isFound)
+			{ closeByFeaturesArray.push(feature);}
+		}
+    }
+        	
+    // only go thru array if there is more than 1 feature
+    if(closeByFeaturesArray.length > 1) 
+    {	    	
+
+		// starting point is the hovered over feature
+		var startingPoint = new OpenLayers.Geometry.Point(
+				closeByFeaturesArray[0].geometry.getBounds().getCenterLonLat().lon,
+				closeByFeaturesArray[0].geometry.getBounds().getCenterLonLat().lat);
+
+		// create Possible positions based on how many end points are in
+		// closeByFeaturesArray
+		// starting pixels
+		var startingPointPixels = this._mapDisplay
+				.getLayerPxFromLonLat(closeByFeaturesArray[0].geometry
+						.getBounds().getCenterLonLat());
+
+		// starting point
+		var sp = new OpenLayers.Geometry.Point(startingPointPixels.x,
+				startingPointPixels.y);
+
+		// number of features away from starting point
+		var steps = closeByFeaturesArray.length;
+
+		var xValues = [];
+		var yValues = [];
+		var radius = 50;
+		var p;
+		var ll;
+
+		// generate possible positions where the end points can be drawn keeping
+		// starting point at center
+		var newMovedToPosition = [];
+		for (var v = 0; v < steps; v++) 
+		{
+			xValues[v] = (sp.x + radius * Math.cos(45 * Math.PI * v / 20));
+			yValues[v] = (sp.y + radius * Math.sin(45 * Math.PI * v / 20));
+
+			p = new OpenLayers.Pixel(xValues[v], yValues[v]);
+			ll = this._mapDisplay.getLonLatFromPixel(p);
+
+			var newPoint = new OpenLayers.Geometry.Point(ll.lon, ll.lat);
+			newMovedToPosition.push(newPoint);
+		}
+
+		// get each feature in array starting at index 1 and move it except the
+		// hovered-over feature which will be first element in array
+		for (var count = 1; count < closeByFeaturesArray.length; count++) 
+		{
+			var newPosition = new OpenLayers.LonLat(
+					newMovedToPosition[count].x, newMovedToPosition[count].y);
+
+			closeByFeaturesArray[count].move(newPosition);
+
+			// end point is the overlapping feature
+			var endPoint = new OpenLayers.Geometry.Point(newPosition.lon,
+					newPosition.lat);
+
+			var pointList = [];
+			pointList.push(startingPoint);
+			pointList.push(endPoint);
+
+			// Create linefeature
+			var lineFeature = new OpenLayers.Feature.Vector(
+					new OpenLayers.Geometry.LineString(pointList), null,
+					style_black);
+
+			// lineLayer.addFeatures([lineFeature]);
+			this._mapView.addFeaturesToSeparateFeaturesLayer(lineFeature);
+		}
+	}
+    
+}
