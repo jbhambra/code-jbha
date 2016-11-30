@@ -1,0 +1,6 @@
+
+www.mulberrytech.com/quickref/xpath2.pdf
+
+http://www.w3.org/TR/xquery-operators/#func-normalize-space
+
+https://docs.marklogic.com/xdmp:quote
